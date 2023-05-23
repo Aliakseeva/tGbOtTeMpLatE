@@ -1,0 +1,41 @@
+version: "3.7"
+
+services:
+  bot:
+    container_name: bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    env_file:
+      .env
+    command:
+      bash -c "alembic upgrade head && python3 cli.py"
+    ports:
+      - "8000:8000"
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app_db_network
+
+  postgres:
+      container_name: postgres
+      image: postgres:15.1-alpine
+      env_file:
+        .env
+      restart: on-failure
+      ports:
+        - 5433:5432
+      networks:
+        - app_db_network
+      healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U $${DB_USER} -d $${DB_NAME} -h $${DB_HOST} -p $${DB_PORT}"]
+        interval: 10s
+        timeout: 10s
+        retries: 5
+
+networks:
+  app_db_network:
+    driver: bridge
