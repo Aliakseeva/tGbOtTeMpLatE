@@ -10,7 +10,7 @@ from src.tgbot.config.config import load_config
 from src.tgbot.middlewares.db import InitMiddleware
 from src.tgbot.middlewares.manager import ManagerMiddleware
 from src.tgbot.middlewares.localizator import TranslatorRunnerMiddleware
-from src.tgbot.handlers import start
+from src.tgbot.handlers import start, payment
 from fluentogram import FluentTranslator, TranslatorHub
 from fluent_compiler.bundle import FluentBundle
 
@@ -54,7 +54,7 @@ async def main():
     dp.message.middleware(TranslatorRunnerMiddleware())
     dp.callback_query.middleware(TranslatorRunnerMiddleware())
     #
-    dp.include_routers(start.router)
+    dp.include_routers(start.router, payment.router)
 
     # Localization tool
 
